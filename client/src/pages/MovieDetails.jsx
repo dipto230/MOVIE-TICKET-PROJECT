@@ -6,6 +6,7 @@ import { Heart, PlayCircleIcon, StarIcon } from 'lucide-react'
 import timeFormat from '../lib/timeFormat'
 import DateSelect from '../components/DateSelect'
 import MovieCard from '../components/MovieCard'
+import Loading from '../components/Loading'
 
 const MovieDetails = () => {
     const navigate = useNavigate()
@@ -14,11 +15,15 @@ const MovieDetails = () => {
 
   const getShow = async () => {
     const movie = dummyShowsData.find(show => show._id === id)
-
-    setShow({
+    if(movie){
+          setShow({
       movie,
       dateTime: dummyDateTimeData
     })
+
+    }
+
+
   }
 
   useEffect(() => {
@@ -117,12 +122,12 @@ const MovieDetails = () => {
 
       </div>
       <div className='flex justify-center mt-20'>
-        <button onClick={()=>navigate('/movies')} className='px-10 py-3 text-sm bg-priamry hover:bg-primary-dull transition rounded-md font-medium cursor-pointer'>Show more</button>
+        <button onClick={()=>{navigate('/movies');scrollTo(0,0)}} className='px-10 py-3 text-sm bg-priamry hover:bg-primary-dull transition rounded-md font-medium cursor-pointer'>Show more</button>
       </div>
 
     </div>
   ) : (
-    <div>Loading...</div>
+  <Loading/>
   )
 }
 
