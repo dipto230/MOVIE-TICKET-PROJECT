@@ -4,14 +4,17 @@ import { assets, dummyDateTimeData, dummyShowsData } from '../assets/assets'
 import Loading from '../components/Loading'
 import { ClockIcon } from 'lucide-react'
 import isoTimeFormat from '../lib/intoTimeFormat'
-import BLurCircle from '../components/BlurCircle'
-
+import BlurCircle from '../components/BlurCircle'
+import { toast } from 'react-toastify'
 
 const SeatLayout = () => {
-    const groupRows = [["A", "B"], ["C", "D"], ["E","F"], ["G", "H"], ["I", "J"]]
+
+  const groupRows = [["A", "B"], ["C", "D"], ["E","F"], ["G", "H"], ["I", "J"]]
+
   const { id, date } = useParams()
 
   const [selectedTime, setSelectedTime] = useState(null)
+  const [selectedSeats, setSelectedSeats] = useState([]) // ✅ FIX
   const [show, setShow] = useState(null)
 
   const getShow = () => {
@@ -24,31 +27,41 @@ const SeatLayout = () => {
       })
     }
   }
-  const handleSeatClick =(seatId)=>{
-    if(!selectedTime){
-        return toast("Please select time first")
+
+  const handleSeatClick = (seatId) => {
+    if (!selectedTime) {
+      return toast("Please select time first")
     }
-    if(!selectedTime.includes(seatId) && selectedSeats.length > 4){
-        return toast("You can only select 5 seats ")
+
+    if (!selectedSeats.includes(seatId) && selectedSeats.length >= 5) {
+      return toast("You can only select 5 seats")
     }
-    setSelectedSeats(prev=>prev.includes(seatId)?prev.filter(seat=>seat !==seatId):[...prev, seatId ])
+
+    setSelectedSeats(prev =>
+      prev.includes(seatId)
+        ? prev.filter(seat => seat !== seatId)
+        : [...prev, seatId]
+    )
   }
-  const renderSeats = (row, count=9)=>(
+
+  const renderSeats = (row, count = 9) => (
     <div key={row} className='flex gap-2 mt-2'>
-        <div className='flex flex-wrap items-center justify-center gap-2'>
-            {Array.from({length:count}, (_,i)=>{
-                const seatId = `${row}${i +1}`;
-                return (
-                    <button key={seatId} onClick={()=>handleSeatClick(seatId)} className={`h-8 w-8 rounded border border-primary/60 cursor-pointer ${selectedSeats.includes(seatId) && "bg-primary text-white"}`}
-                        
-                    >
-                        {seatId}
-                    </button>
-                )
-            })}
+      <div className='flex flex-wrap items-center justify-center gap-2'>
+        {Array.from({ length: count }, (_, i) => {
+          const seatId = `${row}${i + 1}`
 
-        </div>
-
+          return (
+            <button
+              key={seatId}
+              onClick={() => handleSeatClick(seatId)}
+              className={`h-8 w-8 rounded border border-primary/60 cursor-pointer 
+              ${selectedSeats.includes(seatId) ? "bg-primary text-white" : ""}`}
+            >
+              {seatId}
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 
@@ -58,7 +71,7 @@ const SeatLayout = () => {
 
   return show ? (
     <div className='px-6 md:px-16 lg:px-40 py-30 md:pt-50'>
-      
+
       {/* Available Timings */}
       <div className='w-60 bg-primary/10 border border-primary/20 rounded-lg py-10'>
         <p className='text-lg font-semibold px-6'>Available Timings</p>
@@ -83,14 +96,23 @@ const SeatLayout = () => {
 
       {/* seat layout */}
       <div className='relative flex-1 flex flex-col items-center max-md:mt-16'>
-        <BLurCircle top="-100px" left="-100px"/>
-        <BLurCircle bottom="0px" right="0px"/>
+        <BlurCircle top="-100px" left="-100px"/>
+        <BlurCircle bottom="0px" right="0px"/>
+
         <h1 className='text-2xl font-semibold mb-4'>Select Your Seat</h1>
+
         <img src={assets.screenImage} alt='screen'/>
         <p className='text-gray-500 text-sm mb-6'>SCREEN SIDE</p>
 
+        <div className='flex flex-col items-center mt-10 text-xs text-gray-300'>
+          
+          {groupRows.map((group, idx) => (
+            <div key={idx} className='grid grid-cols-2 md:grid-cols-1 gap-8 md:gap-2 mb-6'>
+              {group.map(row => renderSeats(row))}
+            </div>
+          ))}
 
-
+        </div>
       </div>
 
     </div>
