@@ -8,6 +8,7 @@ import BLurCircle from '../components/BlurCircle'
 
 
 const SeatLayout = () => {
+    const groupRows = [["A", "B"], ["C", "D"], ["E","F"], ["G", "H"], ["I", "J"]]
   const { id, date } = useParams()
 
   const [selectedTime, setSelectedTime] = useState(null)
@@ -23,6 +24,33 @@ const SeatLayout = () => {
       })
     }
   }
+  const handleSeatClick =(seatId)=>{
+    if(!selectedTime){
+        return toast("Please select time first")
+    }
+    if(!selectedTime.includes(seatId) && selectedSeats.length > 4){
+        return toast("You can only select 5 seats ")
+    }
+    setSelectedSeats(prev=>prev.includes(seatId)?prev.filter(seat=>seat !==seatId):[...prev, seatId ])
+  }
+  const renderSeats = (row, count=9)=>(
+    <div key={row} className='flex gap-2 mt-2'>
+        <div className='flex flex-wrap items-center justify-center gap-2'>
+            {Array.from({length:count}, (_,i)=>{
+                const seatId = `${row}${i +1}`;
+                return (
+                    <button key={seatId} onClick={()=>handleSeatClick(seatId)} className={`h-8 w-8 rounded border border-primary/60 cursor-pointer ${selectedSeats.includes(seatId) && "bg-primary text-white"}`}
+                        
+                    >
+                        {seatId}
+                    </button>
+                )
+            })}
+
+        </div>
+
+    </div>
+  )
 
   useEffect(() => {
     getShow()
